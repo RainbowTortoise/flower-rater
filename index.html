@@ -3,131 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flower Tinder: 300+ Varieties</title>
+    <title>Flower Rater</title>
     <style>
-        :root { --pass: #ff4757; --smash: #2ed573; --bg: #f1f2f6; }
-        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--bg); margin: 0; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; }
-        
-        /* Tinder Card Container */
-        .tinder-container { position: relative; height: 500px; width: 350px; margin-top: 40px; perspective: 1000px; }
-        .card { position: absolute; width: 100%; height: 100%; background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); overflow: hidden; cursor: grab; transition: transform 0.3s ease, opacity 0.3s ease; touch-action: none; }
-        .card:active { cursor: grabbing; }
-        .img-box { height: 80%; width: 100%; background: #ccc; pointer-events: none; }
-        .img-box img { width: 100%; height: 100%; object-fit: cover; }
-        .info { height: 20%; padding: 15px; text-align: center; }
-        
-        /* Result Lists */
-        .results-section { width: 90%; max-width: 800px; display: flex; gap: 20px; margin: 40px 0; }
-        .list-box { flex: 1; background: white; padding: 15px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); height: 200px; overflow-y: auto; position: relative; }
-        .copy-btn { width: 100%; margin-top: 10px; background: #5352ed; color: white; border: none; padding: 8px; border-radius: 5px; cursor: pointer; }
-        ul { list-style: none; padding: 0; font-size: 13px; }
-        li { padding: 4px 0; border-bottom: 1px solid #f1f2f6; }
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+        }
+        img {
+            max-width: 90%;
+            height: auto;
+            border-radius: 8px;
+        }
+        .rating {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
-
-    <h1>🌸 Flower Tinder</h1>
-    <p>Swipe <b>Right</b> to Like, <b>Left</b> to Dislike</p>
-
-    <div class="tinder-container" id="board">
-        <!-- Cards will be injected here via JavaScript -->
+    <h1>Rate Your Flower</h1>
+    <img src="https://source.unsplash.com/random/800x600/?flower" alt="Random Flower" id="flowerImage">
+    <div class="rating">
+        <button id="likeButton">Like</button>
+        <button id="dislikeButton">Dislike</button>
     </div>
-
-    <div class="results-section">
-        <div class="list-box">
-            <h4 style="color:var(--smash)">Liked ❤️</h4>
-            <ul id="liked-list"></ul>
-            <button class="copy-btn" onclick="copyList('liked')">Copy Liked</button>
-        </div>
-        <div class="list-box">
-            <h4 style="color:var(--pass)">Disliked 👋</h4>
-            <ul id="disliked-list"></ul>
-            <button class="copy-btn" onclick="copyList('disliked')">Copy Disliked</button>
-        </div>
-    </div>
-
     <script>
-        const flowerNames = ["Rose", "Tulip", "Sunflower", "Lavender", "Lily", "Daisy", "Orchid", "Poppy", "Cherry Blossom", "Hydrangea", "Daffodil", "Peony", "Dahlia", "Jasmine", "Hibiscus", "Iris", "Lotus", "Marigold", "Carnation", "Bluebell", "Camellia", "Snapdragon", "Magnolia", "Azalea", "Forget-Me-Not", "Amaryllis", "Chrysanthemum", "Gerbera", "Bird of Paradise", "Aster", "Aconite", "African Daisy", "Agapanthus", "Ageratum", "Alchemilla", "Allium", "Alstroemeria", "Alyssum", "Amaranthus", "Anemone", "Angelonia", "Anise Hyssop", "Antirrhinum", "Aquilegia", "Arabis", "Arctotis", "Armeria", "Arnica", "Arum Lily", "Asclepias", "Asperula", "Astilbe", "Astrantia", "Aubrieta", "Baby's Breath", "Bachelor's Button", "Balloon Flower", "Balsam", "Baptisia", "Begonia", "Bellflower", "Bergenia", "Bidens", "Black-eyed Susan", "Bleeding Heart", "Blue-eyed Grass", "Bougainvillea", "Bouvardia", "Broom", "Browallia", "Buddleia", "Buttercup", "Butterfly Bush", "Cactus Flower", "Caladium", "Calceolaria", "Calendula", "Calla Lily", "Callistemon", "Calluna", "Calochortus", "Campanula", "Campion", "Canna Lily", "Canterbury Bells", "Cape Leadwort", "Cardinal Flower", "Cassia", "Castor Bean", "Catananche", "Catharanthus", "Catmint", "Celosia", "Centaurea", "Centranthus", "Cerastium", "Cercis", "Cestrum", "Chaenomeles", "Chamomille", "Chieranthus", "Chionodoxa", "Choisya", "Christmas Rose", "Cineraria", "Cistus", "Clarkia", "Clematis", "Cleome", "Clerodendrum", "Clivia", "Clover", "Cobaea", "Colchicum", "Coleus", "Columbine", "Comfrey", "Coneflower", "Convallaria", "Convolvulus", "Coreopsis", "Cornflower", "Corydalis", "Cosmos", "Cotoneaster", "Craspedia", "Crataegus", "Crocus", "Crossandra", "Crown Imperial", "Cuckoo Flower", "Cuphea", "Cyclamen", "Cytisus", "Daphne", "Datura", "Daylily", "Delosperma", "Delphinium", "Dendrobium", "Deutzia", "Dianella", "Dianthus", "Diascia", "Dicentra", "Dictamnus", "Diervilla", "Dietes", "Digitalis", "Dimorphotheca", "Dipladenia", "Disa", "Dodecatheon", "Dogwood", "Doronicum", "Dracocephalum", "Drosera", "Dryas", "Dusty Miller", "Dutch Iris", "Echinacea", "Echinops", "Echium", "Edelweiss", "Eichhornia", "Elecampane", "Enkianthus", "Epimedium", "Eremurus", "Erica", "Erigeron", "Erodium", "Erysimum", "Erythronium", "Escallonia", "Eschscholzia", "Eucharis", "Eucomis", "Eupatorium", "Euphorbia", "Eustoma", "Evening Primrose", "Everlasting Flower", "Exochorda", "Fabiana", "Fall Crocus", "Fatsia", "Felicia", "Fennel Flower", "Feverfew", "Fritillaria", "Fuchsia", "Gaillardia", "Galanthus", "Galega", "Galium", "Gardenia", "Gazania", "Gentian", "Geranium", "Geum", "Gilia", "Gladiolus", "Globe Amaranth", "Globe Thistle", "Gloriosa Lily", "Gloxinia", "Goldenrod", "Gomphrena", "Grevillea", "Guzmania", "Gypsophila", "Habenaria", "Halesia", "Hamamelis", "Hardenbergia", "Harebell", "Hawkweed", "Hawthorn", "Heather", "Hebe", "Helenium", "Helianthemum", "Helianthus", "Helichrysum", "Heliconia", "Heliotrope", "Hellebore", "Hemerocallis", "Hepatica", "Hesperis", "Heuchera", "Hibbertia", "Hieracium", "Hippeastrum", "Hollyhock", "Honesty", "Honeysuckle", "Hosta", "Hoya", "Humulus", "Hyacinth", "Hymenocallis", "Hypericum", "Hyssop", "Iberis", "Iceland Poppy", "Ice Plant", "Ilex", "Impatiens", "Incarvillea", "Indian Paintbrush", "Inula", "Ipomoea", "Iresine", "Iris Germanica", "Ismene", "Ixia", "Ixora", "Jacaranda", "Jacob's Ladder", "Jamesia", "Jasminum", "Jovibarba", "Juanulloa", "Juniperus", "Justicia", "Kalmia", "Kangaroo Paw", "Kennedia", "Kerria", "Knautia", "Kniphofia", "Kolkwitzia", "Laburnum", "Lachenalia", "Lactuca", "Lady's Slipper", "Laelia", "Lagerstroemia", "Lagurus", "Lamium", "Lantana", "Lapageria", "Larkspur", "Lathyrus", "Lavatera", "Layia", "Ledum", "Leontopodium", "Leonurus", "Leptospermum", "Lespedeza", "Leucadendron", "Leucanthemum", "Leucojum", "Lewesia", "Leycesteria", "Liatris", "Libertia", "Ligularia", "Ligustrum", "Lilium", "Limnanthes", "Limonium", "Linaria", "Linnaea", "Linum", "Lippia", "Liquidambar", "Liriodendron", "Liriope", "Lisianthus", "Lobelia", "Lobularia", "Lonicera", "Lophospermum", "Lotus Flower", "Luculia", "Lunaria", "Lupine", "Lychnis", "Lycoris", "Lysimachia", "Lythrum", "Macleaya", "Magnolia Stellata", "Mahonia", "Maianthemum", "Malope", "Malva", "Malvaviscus", "Mammillaria", "Mandevilla", "Marigold African", "Matthiola", "Maurandya", "Meconopsis", "Melampodium", "Melia", "Melissa", "Mentha", "Mentzelia", "Menziesia", "Mertensia", "Mesembryanthemum", "Mespilus", "Metrosideros", "Michauxia", "Michelia"];
-
-        let board = document.getElementById('board');
-        let likedArr = [], dislikedArr = [];
-        let curIndex = 0;
-
-        function createCard() {
-            if (curIndex >= flowerNames.length) {
-                board.innerHTML = "<h3>End of the Garden! 🌻</h3>";
-                return;
+        document.addEventListener('keydown', function(event) {
+            if (event.key === "ArrowRight") {
+                document.getElementById('likeButton').click();
+            } else if (event.key === "ArrowLeft") {
+                document.getElementById('dislikeButton').click();
             }
-            const name = flowerNames[curIndex];
-            const card = document.createElement('div');
-            card.className = 'card';
-            card.innerHTML = `
-                <div class="img-box"><img src="https://source.unsplash.com{name}" alt="${name}"></div>
-                <div class="info"><h2>${name}</h2></div>
-            `;
-            board.appendChild(card);
-            initSwipe(card, name);
-        }
-
-        function initSwipe(card, name) {
-            let startX, moveX;
-            
-            const onStart = (e) => {
-                startX = e.pageX || e.touches[0].pageX;
-                card.style.transition = 'none';
-            };
-
-            const onMove = (e) => {
-                if (!startX) return;
-                moveX = (e.pageX || e.touches[0].pageX) - startX;
-                let rotation = moveX / 10;
-                card.style.transform = `translateX(${moveX}px) rotate(${rotation}deg)`;
-            };
-
-            const onEnd = () => {
-                if (Math.abs(moveX) > 100) {
-                    const direction = moveX > 0 ? 'Smash' : 'Pass';
-                    card.style.transition = '0.5s';
-                    card.style.transform = `translateX(${moveX * 5}px) rotate(${moveX / 2}deg)`;
-                    card.style.opacity = '0';
-                    setTimeout(() => {
-                        card.remove();
-                        recordResult(direction, name);
-                        curIndex++;
-                        createCard();
-                    }, 200);
-                } else {
-                    card.style.transition = '0.3s';
-                    card.style.transform = '';
-                }
-                startX = null;
-                moveX = 0;
-            };
-
-            card.addEventListener('mousedown', onStart);
-            card.addEventListener('touchstart', onStart);
-            window.addEventListener('mousemove', onMove);
-            window.addEventListener('touchmove', onMove);
-            window.addEventListener('mouseup', onEnd);
-            window.addEventListener('touchend', onEnd);
-        }
-
-        function recordResult(type, name) {
-            const list = type === 'Smash' ? likedArr : dislikedArr;
-            const element = document.getElementById(type === 'Smash' ? 'liked-list' : 'disliked-list');
-            list.push(name);
-            const li = document.createElement('li');
-            li.innerText = name;
-            element.prepend(li);
-        }
-
-        function copyList(type) {
-            const list = type === 'liked' ? likedArr : dislikedArr;
-            navigator.clipboard.writeText(list.join('\n')).then(() => alert("List Copied!"));
-        }
-
-        // Initialize first card
-        createCard();
+        });
     </script>
 </body>
 </html>
