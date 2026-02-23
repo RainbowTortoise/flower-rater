@@ -3,56 +3,148 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flower Rater</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Quicksand:400,700">
     <style>
-        body { font-family: Arial, sans-serif; }
-        .container { display: flex; }
-        .info { width: 50%; padding: 20px; }
-        .image { width: 50%; display: flex; justify-content: center; align-items: center; }
-        img { max-width: 100%; height: auto; }
+        body {
+            font-family: 'Quicksand', sans-serif;
+            margin: 0;
+            padding: 0;
+            animation: gradient 15s ease infinite;
+            background: linear-gradient(to right, #ff7eb3, #ff758c, #ff6a88, #ff6159, #ff4f81);
+            height: 100vh;
+            color: white;
+        }
+        @keyframes gradient {
+            0% {
+                background: linear-gradient(-45deg, #ff7eb3, #ff758c, #ff6a88);
+            }
+            25% {
+                background: linear-gradient(-45deg, #ff6a88, #ff4f81, #ff6159);
+            }
+            50% {
+                background: linear-gradient(-45deg, #ff4f81, #ff7eb3, #ff758c);
+            }
+            75% {
+                background: linear-gradient(-45deg, #ff758c, #ff6a88, #ff7eb3);
+            }
+            100% {
+                background: linear-gradient(-45deg, #ff7eb3, #ff758c, #ff6a88);
+            }
+        }
+        .flower-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 20px;
+        }
+        .flower-box {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            margin: 15px;
+            padding: 10px;
+            text-align: center;
+            transition: transform 0.3s;
+        }
+        .flower-box:hover {
+            transform: scale(1.05);
+        }
+        img {
+            border-radius: 15px;
+            width: 150px;
+            height: 150px;
+        }
+        .emoji-buttons {
+            display: flex;
+            justify-content: center;
+            margin: 20px;
+        }
+        .emoji {
+            font-size: 30px;
+            cursor: pointer;
+            margin: 0 10px;
+        }
+        .progress-counter {
+            text-align: center;
+            font-size: 20px;
+            margin-top: 20px;
+        }
+        .summary {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+        }
     </style>
+    <title>Flower Rater</title>
 </head>
 <body>
-    <div class="container">
-        <div class="info" id="flower-info">
-            <h2>Flower Information</h2>
-            <p id="flower-details"></p>
-            <!-- Example Data: Replace this with the actual 300 flowers data -->
-            <script>
-                const flowers = [
-                    { commonName: 'Rose', scientificName: 'Rosa', color: 'Red', meaning: 'Love', season: 'Summer', pairedWith: 'Gift', occasions: ['Weddings', 'Bouquets'] },
-                    { commonName: 'Tulip', scientificName: 'Tulipa', color: 'Yellow', meaning: 'Cheerfulness', season: 'Spring', pairedWith: 'Daisies', occasions: ['Personal Interest', 'Bouquets'] },
-                    // ...293 more flowers... 
-                ];
-
-                let currentIndex = 0;  
-
-                function displayFlower(index) {
-                    const flower = flowers[index];
-                    document.getElementById('flower-details').innerHTML = `\n                        <strong>Common Name:</strong> ${flower.commonName} <br />\n                        <strong>Scientific Name:</strong> ${flower.scientificName} <br />\n                        <strong>Color Variants:</strong> ${flower.color} <br />\n                        <strong>Meaning:</strong> ${flower.meaning} <br />\n                        <strong>Season:</strong> ${flower.season} <br />\n                        <strong>Commonly Paired With:</strong> ${flower.pairedWith} <br />\n                        <strong>Occasions:</strong> ${flower.occasions.join(', ')} <br />\n                    `;
-                    document.getElementById('flower-image').src = `${flower.commonName}.jpg`; // Assuming image names match flower names
-                }
-
-                document.addEventListener('keydown', (event) => {
-                    if (event.key === 'ArrowRight') {
-                        currentIndex = (currentIndex + 1) % flowers.length;
-                        displayFlower(currentIndex);
-                    } else if (event.key === 'ArrowLeft') {
-                        currentIndex = (currentIndex - 1 + flowers.length) % flowers.length;
-                        displayFlower(currentIndex);
-                    }
-                });
-
-                displayFlower(currentIndex);
-            </script>
-        </div>
-        <div class="image">
-            <img id="flower-image" src="default.jpg" alt="Flower Image" />
-        </div>
+    <h1>Rate Your Flowers!</h1>
+    <div class="flower-container" id="flowerContainer">
+        <!-- Flower boxes will be dynamically generated here -->
     </div>
-    <div class="summary">
-        <h2>Liked and Disliked Flowers Summary</h2>
-        <div id="summary-details"></div>
+    <div class="emoji-buttons">
+        <span class="emoji" id="likeBtn">💖</span>
+        <span class="emoji" id="dislikeBtn">💔</span>
     </div>
+    <div class="progress-counter" id="progressCounter">
+        Progress: <span id="counter">0</span>/300+
+    </div>
+    <div class="summary" id="summary">
+        <h2>Summary</h2>
+        <p id="summaryContent"></p>
+        <button onclick="copySummary()">Copy Summary</button>
+    </div>
+    <script>
+        const flowers = ['Rose', 'Tulip', 'Sunflower', 'Daisy', /* Include 300+ flower names here */];
+        let currentIndex = 0;
+        let likedFlowers = [];
+        let dislikedFlowers = [];
+
+        function displayFlowers() {
+            const container = document.getElementById('flowerContainer');
+            flowers.forEach((flower, index) => {
+                const flowerBox = document.createElement('div');
+                flowerBox.className = 'flower-box';
+                flowerBox.innerHTML = `<img src='path_to_${flower}.jpg' alt='${flower}' /><p>${flower}</p>`;
+                container.appendChild(flowerBox);
+            });
+        }
+
+        function likeFlower() {
+            likedFlowers.push(flowers[currentIndex]);
+            moveToNextSlide();
+        }
+
+        function dislikeFlower() {
+            dislikedFlowers.push(flowers[currentIndex]);
+            moveToNextSlide();
+        }
+
+        function moveToNextSlide() {
+            currentIndex++;
+            document.getElementById('counter').innerText = currentIndex;
+            if (currentIndex >= flowers.length) {
+                showSummary();
+            }
+        }
+
+        function showSummary() {
+            document.getElementById('summary').style.display = 'block';
+            const summaryContent = `Liked: ${likedFlowers.join(', ')}\nDisliked: ${dislikedFlowers.join(', ')}`;
+            document.getElementById('summaryContent').innerText = summaryContent;
+        }
+
+        function copySummary() {
+            const summary = document.getElementById('summaryContent').innerText;
+            navigator.clipboard.writeText(summary);
+            alert('Summary copied to clipboard!');
+        }
+
+        document.getElementById('likeBtn').onclick = likeFlower;
+        document.getElementById('dislikeBtn').onclick = dislikeFlower;
+        displayFlowers();
+    </script>
 </body>
 </html>
