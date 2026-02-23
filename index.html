@@ -5,42 +5,54 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flower Rater</title>
     <style>
-        body {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f4f4f4;
-        }
-        img {
-            max-width: 90%;
-            height: auto;
-            border-radius: 8px;
-        }
-        .rating {
-            display: flex;
-            justify-content: center;
-            margin-top: 20px;
-        }
+        body { font-family: Arial, sans-serif; }
+        .container { display: flex; }
+        .info { width: 50%; padding: 20px; }
+        .image { width: 50%; display: flex; justify-content: center; align-items: center; }
+        img { max-width: 100%; height: auto; }
     </style>
 </head>
 <body>
-    <h1>Rate Your Flower</h1>
-    <img src="https://source.unsplash.com/random/800x600/?flower" alt="Random Flower" id="flowerImage">
-    <div class="rating">
-        <button id="likeButton">Like</button>
-        <button id="dislikeButton">Dislike</button>
+    <div class="container">
+        <div class="info" id="flower-info">
+            <h2>Flower Information</h2>
+            <p id="flower-details"></p>
+            <!-- Example Data: Replace this with the actual 300 flowers data -->
+            <script>
+                const flowers = [
+                    { commonName: 'Rose', scientificName: 'Rosa', color: 'Red', meaning: 'Love', season: 'Summer', pairedWith: 'Gift', occasions: ['Weddings', 'Bouquets'] },
+                    { commonName: 'Tulip', scientificName: 'Tulipa', color: 'Yellow', meaning: 'Cheerfulness', season: 'Spring', pairedWith: 'Daisies', occasions: ['Personal Interest', 'Bouquets'] },
+                    // ...293 more flowers... 
+                ];
+
+                let currentIndex = 0;  
+
+                function displayFlower(index) {
+                    const flower = flowers[index];
+                    document.getElementById('flower-details').innerHTML = `\n                        <strong>Common Name:</strong> ${flower.commonName} <br />\n                        <strong>Scientific Name:</strong> ${flower.scientificName} <br />\n                        <strong>Color Variants:</strong> ${flower.color} <br />\n                        <strong>Meaning:</strong> ${flower.meaning} <br />\n                        <strong>Season:</strong> ${flower.season} <br />\n                        <strong>Commonly Paired With:</strong> ${flower.pairedWith} <br />\n                        <strong>Occasions:</strong> ${flower.occasions.join(', ')} <br />\n                    `;
+                    document.getElementById('flower-image').src = `${flower.commonName}.jpg`; // Assuming image names match flower names
+                }
+
+                document.addEventListener('keydown', (event) => {
+                    if (event.key === 'ArrowRight') {
+                        currentIndex = (currentIndex + 1) % flowers.length;
+                        displayFlower(currentIndex);
+                    } else if (event.key === 'ArrowLeft') {
+                        currentIndex = (currentIndex - 1 + flowers.length) % flowers.length;
+                        displayFlower(currentIndex);
+                    }
+                });
+
+                displayFlower(currentIndex);
+            </script>
+        </div>
+        <div class="image">
+            <img id="flower-image" src="default.jpg" alt="Flower Image" />
+        </div>
     </div>
-    <script>
-        document.addEventListener('keydown', function(event) {
-            if (event.key === "ArrowRight") {
-                document.getElementById('likeButton').click();
-            } else if (event.key === "ArrowLeft") {
-                document.getElementById('dislikeButton').click();
-            }
-        });
-    </script>
+    <div class="summary">
+        <h2>Liked and Disliked Flowers Summary</h2>
+        <div id="summary-details"></div>
+    </div>
 </body>
 </html>
