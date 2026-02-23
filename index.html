@@ -3,148 +3,130 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Quicksand:400,700">
+    <title>Flower Rater</title>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Quicksand', sans-serif;
             margin: 0;
             padding: 0;
             animation: gradient 15s ease infinite;
-            background: linear-gradient(to right, #ff7eb3, #ff758c, #ff6a88, #ff6159, #ff4f81);
-            height: 100vh;
-            color: white;
+            background: linear-gradient(45deg, pink, coral, red, orange);
+            background-size: 400% 400%;
         }
         @keyframes gradient {
-            0% {
-                background: linear-gradient(-45deg, #ff7eb3, #ff758c, #ff6a88);
-            }
-            25% {
-                background: linear-gradient(-45deg, #ff6a88, #ff4f81, #ff6159);
-            }
-            50% {
-                background: linear-gradient(-45deg, #ff4f81, #ff7eb3, #ff758c);
-            }
-            75% {
-                background: linear-gradient(-45deg, #ff758c, #ff6a88, #ff7eb3);
-            }
-            100% {
-                background: linear-gradient(-45deg, #ff7eb3, #ff758c, #ff6a88);
-            }
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
-        .flower-container {
+        .container {
             display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            margin: 20px;
+            flex-direction: row;
+            justify-content: space-between;
+            padding: 20px;
         }
-        .flower-box {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            margin: 15px;
-            padding: 10px;
+        .info {
+            flex: 1;
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            margin-right: 20px;
+        }
+        .flower-image {
+            flex: 1;
             text-align: center;
-            transition: transform 0.3s;
         }
-        .flower-box:hover {
-            transform: scale(1.05);
-        }
-        img {
-            border-radius: 15px;
-            width: 150px;
-            height: 150px;
+        .flower-image img {
+            border-radius: 20px;
+            max-width: 90%;
+            height: auto;
         }
         .emoji-buttons {
-            display: flex;
-            justify-content: center;
-            margin: 20px;
-        }
-        .emoji {
-            font-size: 30px;
-            cursor: pointer;
-            margin: 0 10px;
+            text-align: center;
+            margin-top: 20px;
         }
         .progress-counter {
             text-align: center;
-            font-size: 20px;
             margin-top: 20px;
         }
         .summary {
             display: none;
-            text-align: center;
             margin-top: 20px;
-            border-radius: 15px;
-            background: rgba(255, 255, 255, 0.1);
-            padding: 20px;
         }
     </style>
-    <title>Flower Rater</title>
 </head>
 <body>
-    <h1>Rate Your Flowers!</h1>
-    <div class="flower-container" id="flowerContainer">
-        <!-- Flower boxes will be dynamically generated here -->
+    <div class="container">
+        <div class="info">
+            <h1>Flower Rating App</h1>
+            <h2 id="flower-name">Flower Name</h2>
+            <p id="flower-info">Information about the flower will go here.</p>
+            <div class="emoji-buttons">
+                <button onclick="rateFlower('like')">👍 Like</button>
+                <button onclick="rateFlower('dislike')">👎 Dislike</button>
+            </div>
+            <div class="progress-counter">
+                <p id="progress-count">Flower 1 of 300+</p>
+            </div>
+        </div>
+        <div class="flower-image">
+            <img id="flower-pic" src="" alt="Flower">
+            <p id="flower-name-below">Flower Name Below</p>
+        </div>
     </div>
-    <div class="emoji-buttons">
-        <span class="emoji" id="likeBtn">💖</span>
-        <span class="emoji" id="dislikeBtn">💔</span>
-    </div>
-    <div class="progress-counter" id="progressCounter">
-        Progress: <span id="counter">0</span>/300+
-    </div>
-    <div class="summary" id="summary">
-        <h2>Summary</h2>
-        <p id="summaryContent"></p>
-        <button onclick="copySummary()">Copy Summary</button>
+    <div class="summary">
+        <h2>Summary of Ratings</h2>
+        <div id="summary-content">Liked/Disliked flowers and their details will show here after rating.</div>
     </div>
     <script>
-        const flowers = ['Rose', 'Tulip', 'Sunflower', 'Daisy', /* Include 300+ flower names here */];
-        let currentIndex = 0;
+        let currentFlower = 0;
         let likedFlowers = [];
         let dislikedFlowers = [];
 
-        function displayFlowers() {
-            const container = document.getElementById('flowerContainer');
-            flowers.forEach((flower, index) => {
-                const flowerBox = document.createElement('div');
-                flowerBox.className = 'flower-box';
-                flowerBox.innerHTML = `<img src='path_to_${flower}.jpg' alt='${flower}' /><p>${flower}</p>`;
-                container.appendChild(flowerBox);
-            });
-        }
-
-        function likeFlower() {
-            likedFlowers.push(flowers[currentIndex]);
-            moveToNextSlide();
-        }
-
-        function dislikeFlower() {
-            dislikedFlowers.push(flowers[currentIndex]);
-            moveToNextSlide();
-        }
-
-        function moveToNextSlide() {
-            currentIndex++;
-            document.getElementById('counter').innerText = currentIndex;
-            if (currentIndex >= flowers.length) {
+        function rateFlower(rating) {
+            if (rating === 'like') {
+                likedFlowers.push(currentFlower);
+            } else {
+                dislikedFlowers.push(currentFlower);
+            }
+            currentFlower++;
+            updateProgress();
+            if (currentFlower >= 300) {
                 showSummary();
+            } else {
+                loadFlower(currentFlower);
             }
         }
 
+        function updateProgress() {
+            document.getElementById('progress-count').textContent = `Flower ${currentFlower + 1} of 300+`;
+        }
+
         function showSummary() {
-            document.getElementById('summary').style.display = 'block';
-            const summaryContent = `Liked: ${likedFlowers.join(', ')}\nDisliked: ${dislikedFlowers.join(', ')}`;
-            document.getElementById('summaryContent').innerText = summaryContent;
+            document.querySelector('.summary').style.display = 'block';
+            document.querySelector('.container').style.display = 'none';
+            // Populate summary content with liked and disliked flowers information
         }
 
-        function copySummary() {
-            const summary = document.getElementById('summaryContent').innerText;
-            navigator.clipboard.writeText(summary);
-            alert('Summary copied to clipboard!');
+        function loadFlower(index) {
+            // Load flower data based on index
+            // Placeholder data for demonstration
+            document.getElementById('flower-name').textContent = `Flower ${index + 1}`;
+            document.getElementById('flower-info').textContent = `Information about Flower ${index + 1}`;
+            document.getElementById('flower-pic').src = `flowers/flower${index + 1}.jpg`;
+            document.getElementById('flower-name-below').textContent = `Flower ${index + 1}`;
         }
 
-        document.getElementById('likeBtn').onclick = likeFlower;
-        document.getElementById('dislikeBtn').onclick = dislikeFlower;
-        displayFlowers();
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'ArrowRight') {
+                rateFlower('like');
+            } else if (event.key === 'ArrowLeft') {
+                rateFlower('dislike');
+            }
+        });
+
+        loadFlower(currentFlower);
     </script>
 </body>
 </html>
